@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voxelcraft — browser voxel sandbox</title>
+  <meta name="description" content="A free browser voxel sandbox: explore infinite procedural terrain, mine blocks, and build. Original code and textures — no downloads, no accounts.">
+  <meta property="og:title" content="Voxelcraft">
+  <meta property="og:description" content="Explore, mine, and build in an infinite procedural voxel world — right in your browser.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%2260%22 y=%2240%22 fill=%22%237a5230%22/><rect width=%22100%22 height=%2240%22 fill=%22%235fa04a%22/></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="crosshair"></div>
+  <div id="underwater"></div>
+  <div id="block-name"></div>
+  <div id="loading"></div>
+  <pre id="debug"></pre>
+  <div id="hotbar"></div>
+
+  <div id="overlay">
+    <div class="panel">
+      <h1>VOXELCRAFT</h1>
+      <p class="tagline">an infinite voxel sandbox in your browser</p>
+      <p class="cta">click anywhere to play</p>
+      <div class="controls">
+        <div><b>WASD</b> move &nbsp; <b>mouse</b> look &nbsp; <b>space</b> jump</div>
+        <div><b>left click</b> mine &nbsp; <b>right click</b> place &nbsp; <b>middle</b> pick block</div>
+        <div><b>1–9 / wheel</b> hotbar &nbsp; <b>ctrl</b> sprint &nbsp; <b>shift</b> sneak</div>
+        <div><b>F</b> or <b>double-space</b> fly &nbsp; <b>P</b> debug &nbsp; <b>esc</b> pause</div>
+      </div>
+      <div class="meta">
+        <span id="seed-label"></span>
+        <button id="new-world">new world</button>
+      </div>
+      <p class="disclaimer">
+        Fan-made original work inspired by the block-building genre.
+        Not affiliated with or endorsed by Mojang or Microsoft.
+        <a href="https://github.com/aymandakir-gh/voxelcraft" target="_blank" rel="noopener">source on GitHub</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
