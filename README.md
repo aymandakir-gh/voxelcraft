@@ -2,7 +2,7 @@
 
 An infinite voxel sandbox that runs entirely in your browser. Explore seeded procedural terrain — hills, mountains, deserts, oceans, caves, ores, and forests — then mine and build with a 9-slot hotbar. Everything is generated at runtime: the code, the textures, and the sounds are all original and procedural. No downloads, no accounts, no assets.
 
-**Play it live:** https://voxelcraft.vercel.app
+**Play it live:** https://voxelcraft-ecru.vercel.app
 
 > Fan-made original work inspired by the block-building genre. Not affiliated with, endorsed by, or derived from Mojang or Microsoft products. All code and art here are original (MIT licensed); nothing is copied from any commercial game.
 
