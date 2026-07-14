@@ -10,7 +10,7 @@ const NIGHT_SKY = new THREE.Color(0x0a1030);
 export class Sky {
   constructor(scene, seed) {
     this.scene = scene;
-    this.time = DAY_LENGTH * 0.25; // start mid-morning
+    this.time = DAY_LENGTH * 0.15; // mid-morning: most of the day ahead before dusk
     this.brightness = 1;
     this.skyColor = DAY_SKY.clone();
 

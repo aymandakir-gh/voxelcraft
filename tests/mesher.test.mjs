@@ -66,3 +66,21 @@ test('meshing is deterministic', () => {
   assert.deepEqual(Array.from(a.solid.positions), Array.from(b.solid.positions));
   assert.deepEqual(Array.from(a.water.indices), Array.from(b.water.indices));
 });
+
+test('every triangle is wound counter-clockwise relative to its face normal', () => {
+  const get = worldFromMap(new Map([['3,5,3', B.STONE]]));
+  const { solid } = meshChunk(get, 0, 0);
+  const P = solid.positions, N = solid.normals, I = solid.indices;
+  for (let t = 0; t < I.length; t += 3) {
+    const [a, b, c] = [I[t] * 3, I[t + 1] * 3, I[t + 2] * 3];
+    const e1 = [P[b] - P[a], P[b + 1] - P[a + 1], P[b + 2] - P[a + 2]];
+    const e2 = [P[c] - P[a], P[c + 1] - P[a + 1], P[c + 2] - P[a + 2]];
+    const cross = [
+      e1[1] * e2[2] - e1[2] * e2[1],
+      e1[2] * e2[0] - e1[0] * e2[2],
+      e1[0] * e2[1] - e1[1] * e2[0],
+    ];
+    const dot = cross[0] * N[a] + cross[1] * N[a + 1] + cross[2] * N[a + 2];
+    assert.ok(dot > 0, `triangle at index ${t} winds clockwise vs normal (${N[a]},${N[a + 1]},${N[a + 2]})`);
+  }
+});

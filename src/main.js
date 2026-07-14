@@ -18,7 +18,9 @@ const params = new URLSearchParams(location.search);
 let seed;
 if (params.has('seed')) {
   const s = params.get('seed');
-  seed = /^-?\d+$/.test(s) ? (parseInt(s, 10) | 0) : seedFromString(s);
+  // Normalize to signed 32-bit so the localStorage round-trip (parseInt|0)
+  // yields the identical value and saved edits stay reachable
+  seed = /^-?\d+$/.test(s) ? (parseInt(s, 10) | 0) : (seedFromString(s) | 0);
 } else {
   const stored = localStorage.getItem('voxelcraft.seed');
   seed = stored ? (parseInt(stored, 10) | 0) : ((Math.random() * 0xffffffff) | 0);
@@ -66,7 +68,13 @@ const world = new World(scene, generator, persistence, {
   solid: solidMaterial, water: waterMaterial,
 });
 
-const savedPlayer = persistence.loadPlayer();
+let savedPlayer = persistence.loadPlayer();
+if (savedPlayer && !(savedPlayer.pos &&
+    Number.isFinite(savedPlayer.pos.x) &&
+    Number.isFinite(savedPlayer.pos.y) &&
+    Number.isFinite(savedPlayer.pos.z))) {
+  savedPlayer = null; // malformed save — fall back to a fresh spawn
+}
 const spawn = savedPlayer ? savedPlayer.pos : generator.findSpawn();
 const player = new Player(world, spawn);
 if (savedPlayer) {
@@ -92,7 +100,13 @@ let locked = false;
 const overlay = document.getElementById('overlay');
 
 function requestLock() {
-  canvas.requestPointerLock();
+  if (!canvas.requestPointerLock) {
+    hud.setLoading('This game needs a mouse and pointer-lock support (desktop browser).');
+    return;
+  }
+  // Chrome rejects re-lock within ~1.25s of Esc; swallow it, the user just clicks again
+  const p = canvas.requestPointerLock();
+  if (p && p.catch) p.catch(() => {});
 }
 
 overlay.addEventListener('click', requestLock);
@@ -120,13 +134,21 @@ document.addEventListener('keydown', (e) => {
     if (n >= 1 && n <= HOTBAR.length) hud.select(n - 1);
     return;
   }
+  if (e.repeat) return; // OS key auto-repeat must not re-trigger fly/jump toggles
   player.onKeyDown(e.code);
 });
 
 document.addEventListener('keyup', (e) => player.onKeyUp(e.code));
 
+// Accumulate wheel delta so inertial trackpad scrolling steps one slot per
+// notch-worth of travel instead of one per event
+let wheelAccum = 0;
 document.addEventListener('wheel', (e) => {
-  if (locked) hud.select(hud.selected + (e.deltaY > 0 ? 1 : -1));
+  if (!locked) return;
+  wheelAccum += e.deltaY;
+  const STEP = 55;
+  while (wheelAccum >= STEP) { hud.select(hud.selected + 1); wheelAccum -= STEP; }
+  while (wheelAccum <= -STEP) { hud.select(hud.selected - 1); wheelAccum += STEP; }
 });
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());

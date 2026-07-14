@@ -129,9 +129,14 @@ export class World {
     }
   }
 
+  // All 8 neighbors: AO corner samples on border faces reach diagonally
   neighborsGenerated(cx, cz) {
-    return this.isGenerated(cx - 1, cz) && this.isGenerated(cx + 1, cz) &&
-           this.isGenerated(cx, cz - 1) && this.isGenerated(cx, cz + 1);
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if ((dx || dz) && !this.isGenerated(cx + dx, cz + dz)) return false;
+      }
+    }
+    return true;
   }
 
   generateChunk(cx, cz) {
@@ -143,11 +148,12 @@ export class World {
     }
     const chunk = new Chunk(cx, cz, data);
     this.chunks.set(key, chunk);
-    // Freshly available data can change culling at the borders of neighbors
-    this.markDirty(cx - 1, cz);
-    this.markDirty(cx + 1, cz);
-    this.markDirty(cx, cz - 1);
-    this.markDirty(cx, cz + 1);
+    // Freshly available data can change culling/AO at neighbor borders and corners
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx || dz) this.markDirty(cx + dx, cz + dz);
+      }
+    }
     return chunk;
   }
 
